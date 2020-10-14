@@ -1,7 +1,7 @@
 import { arr, promise } from 'lively.lang';
 import { pt, LinearGradient, Color, Rectangle } from 'lively.graphics';
 import {
-  Label,
+  Label, GridLayout,
   morph,
   Morph,
   HorizontalLayout,
@@ -182,12 +182,8 @@ export default class Window extends Morph {
     resizer.bottomRight = innerB.bottomRight();
 
     // targetMorph
-    if (!this.minimized && this.targetMorph && this.targetMorph.isLayoutable) this.targetMorph.setBounds(this.targetMorphBounds());
-
-    // title
-    title.textBounds().width < labelBounds.width - 2 * buttonOffset
-      ? (title.center = labelBounds.center())
-      : (title.leftCenter = minLabelBounds.leftCenter());
+    if (!this.minimized && this.targetMorph && this.targetMorph.isLayoutable)
+      this.targetMorph.setBounds(this.targetMorphBounds());
 
     header.width = this.width;
   }
