@@ -134,7 +134,8 @@ export class ObjectEditor extends Morph {
 
   reset () {
     // this.rebuild()
-    const l = this.layout = new GridLayout({
+    var l = this.layout = new GridLayout({
+      renderViaCSS: true,
       grid: [
         ['objectCommands', 'objectCommands', 'objectCommands'],
         ['classTree', 'frozen warning', 'importController'],
@@ -320,18 +321,19 @@ export class ObjectEditor extends Morph {
       {
         name: 'objectCommands',
         reactsToPointer: false,
-        width: 401,
         layout: new GridLayout({
+          renderViaCSS: true,
           fitToCell: false,
           grid: [
-            [null, 'target controls', null, 'freezer controls', null]
+            [null, 'target controls', 'freezer controls'],
           ],
-          columns: [1, { fixed: 100 }, 3, { fixed: 100 }, 4, { fixed: 10 }]
+          columns: [1, { fixed: 100 }, 2, { align: 'rightCenter' }]
         }),
+        
         submorphs: [
           {
             ...wrapperStyle,
-            layout: new HorizontalLayout({ direction: 'centered', spacing: 2, autoResize: false }),
+            layout: new HorizontalLayout({ renderViaCSS: true, direction: "centered", spacing: 2, autoResize: false}),
             name: 'target controls',
             topCenter: pt(200, 0),
             submorphs: [
@@ -343,7 +345,7 @@ export class ObjectEditor extends Morph {
           {
             ...wrapperStyle,
             name: 'freezer controls',
-            layout: new HorizontalLayout({ direction: 'rightToLeft', spacing: 2, autoResize: false }),
+            layout: new HorizontalLayout({ renderViaCSS: true, direction: "rightToLeft", spacing: 2, autoResize: false}),
             right: 400,
             submorphs: [
               { ...topBtnStyle, name: 'freezeTargetButton', label: Icon.textAttribute('snowflake', { textStyleClasses: ['far'] }), tooltip: 'publish target' },
@@ -356,14 +358,12 @@ export class ObjectEditor extends Morph {
       {
         name: 'classAndMethodControls',
         width: 100,
-        layout: new HorizontalLayout({ direction: 'centered', spacing: 2, autoResize: false }),
-        submorphs: [
-          { ...btnStyle, name: 'addButton', label: Icon.textAttribute('plus'), tooltip: 'add a new method' },
-          { ...btnStyle, name: 'removeButton', label: Icon.textAttribute('minus'), tooltip: 'remove a method or class' },
-          { ...btnStyle, name: 'forkPackageButton', label: Icon.textAttribute('code-branch'), tooltip: 'fork package' },
-          { ...btnStyle, name: 'openInBrowserButton', label: Icon.textAttribute('external-link-alt'), tooltip: 'open selected class in system browser' }
-        ]
-      },
+        layout: new HorizontalLayout({ renderViaCSS: true, direction: "centered", spacing: 2, autoResize: false}), submorphs: [
+          {...btnStyle, name: "addButton", label: Icon.textAttribute("plus"), tooltip: "add a new method"},
+          {...btnStyle, name: "removeButton", label: Icon.textAttribute("minus"), tooltip: "remove a method or class"},
+          {...btnStyle, name: "forkPackageButton", label: Icon.textAttribute("code-branch"), tooltip: "fork package"},
+          {...btnStyle, name: "openInBrowserButton", label: Icon.textAttribute("external-link-alt"), tooltip: "open selected class in system browser"},
+        ]},
 
       { name: 'sourceEditor', ...textStyle },
 
@@ -384,6 +384,7 @@ export class ObjectEditor extends Morph {
       {
         name: 'sourceEditorControls',
         layout: new GridLayout({
+          renderViaCSS: true,
           reactToSubmorphAnimations: true,
           rows: [0, { paddingTop: 2, paddingBottom: 3 }],
           columns: [
@@ -1821,6 +1822,7 @@ class ImportController extends Morph {
     ];
 
     this.layout = new GridLayout({
+      renderViaCSS: true,
       grid: [
         ['importsList'],
         ['buttons']

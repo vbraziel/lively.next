@@ -348,15 +348,32 @@ export default class Browser extends Morph {
         ]
       },
 
-      {
-        name: 'codeEntityCommands',
-        bounds: codeEntityCommandBoxBounds,
-        layout: new HorizontalLayout({ spacing: 2, autoResize: false, direction: 'rightToLeft' }),
-        fill: Color.transparent,
-        submorphs: [
-          { ...btnDarkStyle, name: 'codeEntityJumpButton', label: Icon.makeLabel('search'), tooltip: 'search for code entity' }
-        ]
-      },
+          new Tree({name: "codeEntityTree", treeData: new CodeDefTreeData([]),
+            bounds: codeEntityTreeBounds, 
+            borderWidth: { bottom: 1, top: 0, left: 0, right: 0 },
+            borderColor: Color.gray,
+            ...style
+          }),
+
+          {name: "moduleCommands", bounds: moduleCommandBoxBounds,
+            layout: new HorizontalLayout({ renderViaCSS: true, spacing: 3, autoResize: false, direction: "rightToLeft"}),
+            borderRight: {color: Color.gray, width: 1},
+            reactsToPointer: false,
+            fill: Color.transparent,
+            submorphs: [
+              {...btnDarkStyle, name: "addModuleButton", label: Icon.makeLabel("plus"), tooltip: "add module"},
+              {...btnDarkStyle, name: "removeModuleButton", label: Icon.textAttribute("minus"), tooltip: "remove package"},
+              {...btnDarkStyle, name: "runTestsInModuleButton", label: morph({
+               type: "label", value: "run tests", padding: rect(1,0,0,-2)
+              }), tooltip: "run tests", visible: false, padding: rect(5,-3,0,2)}
+            ]},
+
+          {name: "codeEntityCommands", bounds: codeEntityCommandBoxBounds,
+            layout: new HorizontalLayout({ renderViaCSS: true, spacing: 2, autoResize: false, direction: "rightToLeft"}),
+            fill: Color.transparent,
+            submorphs: [
+              {...btnDarkStyle, name: "codeEntityJumpButton", label: Icon.makeLabel("search"), tooltip: "search for code entity"},
+            ]},
 
       new HorizontalResizer({ name: 'hresizer', bounds: resizerBounds }),
 
@@ -410,47 +427,85 @@ export default class Browser extends Morph {
         borderBottom: { color: Color.gray, width: 1 },
         submorphs: [
           {
-            name: 'commands',
-            layout: new HorizontalLayout({
-              spacing: 2,
-              autoResize: false,
-              layoutOrder: function (m) {
-                return this.container.submorphs.indexOf(m);
-              }
+            name: "metaInfoText",
+            bounds: metaInfoBounds,
+            ...textStyle,
+            type: 'text',
+            autofit: false,
+            fill: Color.white,
+            fontSize: config.codeEditor.defaultStyle.fontSize - 2,
+            clipMode: "hidden",
+            borderWidth: 1
+          },
+          {name: "sourceEditor", bounds: sourceEditorBounds, 
+           borderRadius: Rectangle.inset(7,0,7,7),
+           borderWidthLeft: 3,
+           ...textStyle},
+           // {
+           //   name: "save note",
+           //   master: { auto: "styleguide://System/saveNote"},
+           //   submorphs: [
+           //     { name: "save module info", type: "text"},
+           //     { name: "checkmark", type: "label"},
+           //   ]
+           // },
+          {
+            name: "frozen-warning",
+            master: { auto: "styleguide://System/frozenWarning" },
+            height: 0,
+            submorphs: [
+              { type: "text", name: "frozen-module-info", fixedWidth: true },
+              Icon.makeLabel('snowflake', { name: "snowflake" })
+            ]
+          },
+
+          {name: "browserCommands", bounds: browserCommandsBounds,
+            layout: new GridLayout({
+              renderViaCSS: true,
+              grid: [["commands", null, "eval backend button", null]],
+              rows: [0, {paddingBottom: 2}],
+              columns: [0, {paddingLeft: 2}, 2, {fixed: 100}, 3, {fixed: 5}],
+              groups: {commands: {resize: false}, "eval backend button": { resize: false }}
             }),
             fill: Color.transparent,
             submorphs: [
-              { ...btnStyle, name: 'historyBackwardButton', label: Icon.makeLabel('step-backward'), tooltip: 'back in browse history' },
-              { ...btnStyle, name: 'browseHistoryButton', label: Icon.makeLabel('history'), tooltip: 'show browse history' },
-              { ...btnStyle, name: 'historyForwardButton', label: Icon.makeLabel('step-forward'), tooltip: 'forward in browse history' },
+              {name: "commands", layout: new HorizontalLayout({
+                renderViaCSS: true,
+                spacing: 2, autoResize: false, layoutOrder: function(m) {
+                  return this.container.submorphs.indexOf(m);
+                }}),
+              fill: Color.transparent,
+              submorphs: [
+                {...btnStyle, name: "historyBackwardButton", label: Icon.makeLabel("step-backward"), tooltip: "back in browse history"},
+                {...btnStyle, name: "browseHistoryButton", label: Icon.makeLabel("history"), tooltip: "show browse history"},
+                {...btnStyle, name: "historyForwardButton", label: Icon.makeLabel("step-forward"), tooltip: "forward in browse history"},
 
-              { extent: pt(10, 18), fill: Color.transparent },
+                {extent: pt(10,18), fill: Color.transparent},
 
-              { ...btnStyle, name: 'searchButton', label: Icon.makeLabel('search'), tooltip: 'code search' },
-              { ...btnStyle, name: 'browseModulesButton', label: Icon.makeLabel('bars'), tooltip: 'list all modules' },
+                {...btnStyle, name: "searchButton", label: Icon.makeLabel("search"), tooltip: "code search"},
+                {...btnStyle, name: "browseModulesButton", label: Icon.makeLabel("bars"), tooltip: "list all modules"},
 
-              { extent: pt(10, 18), fill: Color.transparent },
+                {extent: pt(10,18), fill: Color.transparent},
 
-              { ...btnStyle, name: 'addPackageButton', label: Icon.makeLabel('plus'), tooltip: 'add package' },
-              { ...btnStyle, name: 'removePackageButton', label: Icon.makeLabel('minus'), tooltip: 'remove package' },
-              { ...btnStyle, name: 'runTestsInPackageButton', label: 'run tests', tooltip: 'run tests', styleClasses: [], fontSize: 10, padding: rect(6, 3, 0, -1) }
+                {...btnStyle, name: "addPackageButton", label: Icon.makeLabel("plus"), tooltip: "add package"},
+                {...btnStyle, name: "removePackageButton", label: Icon.makeLabel("minus"), tooltip: "remove package"},
+                {...btnStyle, name: "runTestsInPackageButton", label: "run tests", tooltip: "run tests", styleClasses: [], fontSize: 10, padding: rect(6,3,0,-1)}
 
-            ]
-          },
-          EvalBackendChooser.default.ensureEvalBackendDropdown(this, 'local')]
-      }
-    ];
+              ]},
+              EvalBackendChooser.default.ensureEvalBackendDropdown(this, "local")]}
+        ];
 
-    const browserCommands = container.getSubmorphNamed('browserCommands');
-    const hresizer = container.getSubmorphNamed('hresizer');
-    const moduleList = container.getSubmorphNamed('moduleList');
-    const moduleCommands = container.getSubmorphNamed('moduleCommands');
-    const codeEntityCommands = container.getSubmorphNamed('codeEntityCommands');
-    const codeEntityTree = container.getSubmorphNamed('codeEntityTree');
-    const sourceEditor = container.getSubmorphNamed('sourceEditor');
-    const frozenWarning = container.getSubmorphNamed('frozen-warning');
-    const metaInfoText = container.getSubmorphNamed('metaInfoText');
-    const evalBackendChooser = container.getSubmorphNamed('eval backend button');
+
+    let browserCommands =    container.getSubmorphNamed("browserCommands"),
+        hresizer =           container.getSubmorphNamed("hresizer"),
+        moduleList =         container.getSubmorphNamed("moduleList"),
+        moduleCommands =     container.getSubmorphNamed("moduleCommands"),
+        codeEntityCommands = container.getSubmorphNamed("codeEntityCommands"),
+        codeEntityTree =     container.getSubmorphNamed("codeEntityTree"),
+        sourceEditor =       container.getSubmorphNamed("sourceEditor"),
+        frozenWarning =      container.getSubmorphNamed("frozen-warning"),
+        metaInfoText =       container.getSubmorphNamed("metaInfoText"),
+        evalBackendChooser = container.getSubmorphNamed("eval backend button");
 
     evalBackendChooser.width = 150;
 
