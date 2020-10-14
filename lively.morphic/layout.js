@@ -210,6 +210,7 @@ class Layout {
   }
 
   ensureBoundsMonitor(node, morph) {
+    if (!morph.isLayoutable) return;
     let observer = this._resizeObservers.get(morph);
     if (observer) return observer;
     observer = new window.ResizeObserver(([entry]) => {
@@ -368,7 +369,7 @@ class FloatLayout extends Layout {
 
     if (!observer) observer = this.ensureBoundsMonitor(target, morph);
     // only do that if we have changed size in height
-    if (this.contentRectChanged()) {
+    if (this.contentRectChanged(observer, contentRect)) {
       const renderer = morph.env.renderer;
       observer._lastContentRect = contentRect;
       
@@ -781,7 +782,7 @@ export class HorizontalLayout extends FloatLayout {
       if (!this.resizeSubmorphs) style.height = 'auto';
     }
     style.justifyContent = ({leftToRight: 'flex-start', rightToLeft: 'flex-end', centered: 'center'})[this.direction];
-    style.alignItems = ({ center: 'center', left: 'flex-start', right: 'flex-end'})[this.align];
+    style.alignItems = ({ center: 'center', top: 'flex-start', bottom: 'flex-end'})[this.align];
     style.flexDirection = 'row';
     style.paddingLeft = `${this.spacing / 2}px`;
     style.paddingRight = `${this.spacing / 2}px`;
@@ -1097,7 +1098,8 @@ export class TilingLayout extends Layout {
 
   addContainerCSS(morph, style) {
     style.display = 'flex';
-    style['align-content'] = 'flex-start';
+    //style['align-content'] = 'flex-start';
+    style['justify-content'] = ({ left: 'flex-start', center: 'center', right: 'flex-end'})[this.align];
     style['flex-flow'] = (this.axis == 'columns' ? 'column' : 'row') + ' wrap';
     style.paddingTop = `${this.spacing / 2}px`;
     style.paddingBottom = `${this.spacing / 2}px`;
