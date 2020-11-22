@@ -493,7 +493,8 @@ export default class Browser extends Morph {
 
               ]},
               EvalBackendChooser.default.ensureEvalBackendDropdown(this, "local")]}
-        ];
+          ]
+      }];
 
 
     let browserCommands =    container.getSubmorphNamed("browserCommands"),
